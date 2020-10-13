@@ -1,4 +1,13 @@
-import {ADD, GET_SEASONS, HIDE_LOADER, REMOVE_LIST_TEAM, SEARCH_TEAM, SHOW_LOADER} from "./action-types";
+import {
+  ADD,
+  GET_SEASONS,
+  HAVE_STATS,
+  HIDE_LOADER,
+  NO_STATS,
+  REMOVE_LIST_TEAM,
+  SEARCH_TEAM,
+  SHOW_LOADER
+} from "./action-types";
 
 export const addPlayersStats = (some) => {
   return {
@@ -11,32 +20,37 @@ export const addPlayersStatsFetch = (team, season) => {
   const nextSeason = season + 1;
   return async (dispatch) => {
     dispatch(removeListTeam())
-    dispatch(showLoader())
+    dispatch(hasStats())
 
     const res = await fetch(`https://statsapi.web.nhl.com/api/v1/teams/${team}/roster?expand=team.roster&season=${season}${nextSeason}`)
-    const data = (await res.json()).roster;
-    const allRosterInfo = data.map(async (player) => {
-      const resStats = await (await fetch(`https://statsapi.web.nhl.com/api/v1/people/${player.person.id}/stats?stats=statsSingleSeason&season=${season}${nextSeason}`)).json()
-      const resPlayer = await (await fetch(`https://statsapi.web.nhl.com/api/v1/people/${player.person.id}`)).json()
-      const resPhoto = await fetch(`https://cms.nhl.bamgrid.com/images/headshots/current/168x168/${player.person.id}.jpg`)
+    if (res.status !== 404) {
+      const data = (await res.json()).roster;
+      dispatch(showLoader())
+      const allRosterInfo = data.map(async (player) => {
+        const resStats = await (await fetch(`https://statsapi.web.nhl.com/api/v1/people/${player.person.id}/stats?stats=statsSingleSeason&season=${season}${nextSeason}`)).json()
+        const resPlayer = await (await fetch(`https://statsapi.web.nhl.com/api/v1/people/${player.person.id}`)).json()
+        const resPhoto = await fetch(`https://cms.nhl.bamgrid.com/images/headshots/current/168x168/${player.person.id}.jpg`)
 
-      if (resPhoto.status !== 200) {
+        if (resPhoto.status !== 200) {
+          return {
+            playerInfo: resPlayer.people[0],
+            stats: resStats.stats[0].splits && resStats.stats[0].splits[0],
+            photoLink: `https://cms.nhl.bamgrid.com/images/headshots/current/168x168/skater.jpg`
+          }
+        }
         return {
           playerInfo: resPlayer.people[0],
           stats: resStats.stats[0].splits && resStats.stats[0].splits[0],
-          photoLink: `https://cms.nhl.bamgrid.com/images/headshots/current/168x168/skater.jpg`
+          photoLink: `https://cms.nhl.bamgrid.com/images/headshots/current/168x168/${player.person.id}.jpg`
         }
-      }
-      return {
-        playerInfo: resPlayer.people[0],
-        stats: resStats.stats[0].splits && resStats.stats[0].splits[0],
-        photoLink: `https://cms.nhl.bamgrid.com/images/headshots/current/168x168/${player.person.id}.jpg`
-      }
-    })
+      })
 
-    Promise.all(allRosterInfo)
-      .then(res => dispatch(addPlayersStats(res)))
-      .then(() => dispatch(hideLoader()))
+      Promise.all(allRosterInfo)
+        .then(res => dispatch(addPlayersStats(res)))
+        .then(() => dispatch(hideLoader()))
+    } else {
+      dispatch(noStats())
+    }
   }
 }
 
@@ -80,5 +94,17 @@ export const hideLoader = () => {
 export const removeListTeam = () => {
   return {
     type: REMOVE_LIST_TEAM
+  }
+}
+
+export const noStats = () => {
+  return {
+    type: NO_STATS
+  }
+}
+
+export const hasStats = () => {
+  return {
+    type: HAVE_STATS
   }
 }
