@@ -15,9 +15,9 @@ const Form = () => {
 
   const selectTeam = (e) => {
     e.preventDefault()
-    const { team: { value: team }, season: { value: season }  } = e.target
-    if (team) {
-      dispatch(addPlayersStatsFetch(team, +season))
+    const { team, season} = e.target
+    if (team.value && team.value !== 'DEF') {
+      dispatch(addPlayersStatsFetch(team.value, +season.value))
     }
   }
 
@@ -37,14 +37,16 @@ const Form = () => {
         className="form-control mb-2"
         name="team"
         onChange={changeTeam}
+        defaultValue={'DEF'}
       >
-        <option selected disabled value="">Team</option>
+        <option disabled value='DEF'>Team</option>
         {teams.length && teams.map(team => <OptionTeam key={team.name} team={team}/>)}
       </select>
       {seasons.length ? <select
         id="inputYear"
         className="form-control mb-2"
         name="season"
+        defaultValue={'DEF'}
       >
         {seasons.map(season => <OptionSeason key={season} season={season}/>)}
       </select> : null}

@@ -1,3 +1,6 @@
 export const ADD = 'ADD'
 export const SEARCH_TEAM = 'SEARCH_TEAM'
 export const GET_SEASONS = 'GET_SEASONS'
+export const SHOW_LOADER = 'SHOW_LOADER'
+export const HIDE_LOADER = 'HIDE_LOADER'
+export const REMOVE_LIST_TEAM = 'REMOVE_LIST_TEAM'
