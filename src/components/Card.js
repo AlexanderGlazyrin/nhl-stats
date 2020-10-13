@@ -2,10 +2,13 @@ import React from 'react';
 
 const Card = ({playerInfo, stats}) => {
   return (
-    <div>
-      {playerInfo.fullName}: {playerInfo.primaryPosition.code !== 'G' ? `Голов - ${stats ? stats.stat.goals : 0}, Передач - ${stats ? stats.stat.assists : 0}` :
-      `Количество игр - ${stats ? stats.stat.games : 0}, процент отраженных бросков - ${stats ? stats.stat.evenStrengthSavePercentage.toFixed(2) : 0}`}
-    </div>
+      <div className="card text-center" style={{width: "30%", marginBottom: "20px"}}>
+        <div className="card-body">
+          <h5 className="card-title">{playerInfo.fullName}</h5>
+          <p className="card-text">{playerInfo.primaryPosition.code !== 'G' ? `Goals - ${stats ? stats.stat.goals : 0}, Assists - ${stats ? stats.stat.assists : 0}` :
+            `GP - ${stats ? stats.stat.games : 0}, Save % - ${stats ? stats.stat.evenStrengthSavePercentage.toFixed(2) : 0}`}</p>
+        </div>
+      </div>
   );
 };
 

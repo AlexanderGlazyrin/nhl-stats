@@ -1,14 +1,12 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import Card from "./Card";
-import {useDispatch, useSelector} from "react-redux";
-import {addSomeFetch} from "../redux/action-creator";
+import {useSelector} from "react-redux";
 
 const List = () => {
-  const dispatch = useDispatch();
   const players = useSelector(state => state.players)
 
   return (
-    <div>
+    <div className="d-flex justify-content-between flex-wrap">
       {players.length ? players.map(player => <Card key={player.playerInfo.id} playerInfo={player.playerInfo} stats={player.stats}/>) : null}
     </div>
   );
